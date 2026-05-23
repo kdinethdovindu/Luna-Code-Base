@@ -1,0 +1,33 @@
+# Virtual environments (specific to avoid ignoring the main project /lib folder and the /luna/robot-site-2 web interface)
+/luna/bin/
+/luna/include/
+/luna/lib/
+/luna/share/
+/luna/pyvenv.cfg
+
+/code/final/bin/
+/code/final/include/
+/code/final/lib/
+/code/final/share/
+/code/final/pyvenv.cfg
+
+# Compiled / cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Temporary runtime files
+/captured.jpg
+/compressed.jpg
+/test.jpg
+/test.wav
+
+# Large Picovoice source files and archives (already compiled in /lib)
+/rhino-3.0/
+/rhino-3.0.tar.gz
+
+# OS specific files
+.DS_Store
+Thumbs.db
+db.sqlite3

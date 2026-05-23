@@ -1,0 +1,59 @@
+import RPi.GPIO as GPIO
+import time
+import threading
+from config import Config
+
+
+class TouchSensor:
+    def __init__(self, leds, eyes, servos):
+        self.leds = leds
+        self.eyes = eyes
+        self.servos = servos
+        self.touch_pin = 4  # GPIO 4 (Physical Pin 7)
+        self.cooldown = Config.TOUCH_COOLDOWN
+        self.last_touch_time = 0
+
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+        GPIO.setup(self.touch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+    def listen_for_touch(self):
+        print("[TouchSensor] Ready on GPIO 4...")
+        while True:
+            if GPIO.input(self.touch_pin) == GPIO.HIGH:
+                now = time.time()
+                if now - self.last_touch_time >= self.cooldown:
+                    self.last_touch_time = now
+                    print("[TouchSensor] Touch detected!")
+
+                    # Start the reaction in a thread
+                    threading.Thread(target=self._handle_touch, daemon=True).start()
+
+            time.sleep(0.1)
+
+    def _handle_touch(self):
+        # Disable blinking
+        self.eyes.auto_blink = False
+        self.eyes.set_mood("love")
+        self.leds.love()
+
+
+        threading.Thread(target=self.servos.perform_love, daemon=True).start()
+        duration = 5.0  # adjust as needed
+
+        # Keep drawing love mood for 2.5 seconds
+        start_time = time.time()
+        while time.time() - start_time < duration:
+            self.eyes.update()
+            time.sleep(0.05)
+
+        self.eyes.set_mood("neutral")
+        self.leds.set_neutral()
+
+        # to take the eye back to normal
+        for _ in range(20):  # show neutral for 1 second
+            self.eyes.update()
+            time.sleep(0.05)
+
+        # Re-enable blinking
+        self.eyes.auto_blink = True
